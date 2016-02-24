@@ -1,8 +1,10 @@
 // Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
 #pragma once
 #include "GameFramework/Actor.h"
+#include "Unit.h"
 #include "FinalProjectBlock.generated.h"
 
+class AUnit;
 /** A block that can be clicked */
 UCLASS(minimalapi)
 class AFinalProjectBlock : public AActor
@@ -18,8 +20,14 @@ class AFinalProjectBlock : public AActor
 	class UStaticMeshComponent* BlockMesh;
 
 public:
+    
+    //unit currently occupying this block
+    AUnit* unit;
+    int row;
+    int column;
 	AFinalProjectBlock();
-
+    
+    FVector BlockLocation;
 	/** Are we currently active? */
 	bool bIsActive;
 
@@ -28,8 +36,8 @@ public:
 	class UMaterialInstance* OrangeMaterial;
 
 	/** Grid that owns us */
-	UPROPERTY()
-	class AFinalProjectBlockGrid* OwningGrid;
+	/*UPROPERTY()
+	class AFinalProjectBlockGrid* OwningGrid;*/
 
 	/** Handle the block being clicked */
 	UFUNCTION()

@@ -2,7 +2,6 @@
 
 #include "FinalProject.h"
 #include "FinalProjectBlock.h"
-#include "FinalProjectBlockGrid.h"
 
 AFinalProjectBlock::AFinalProjectBlock()
 {
@@ -28,7 +27,7 @@ AFinalProjectBlock::AFinalProjectBlock()
 	// Create static mesh component
 	BlockMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BlockMesh0"));
 	BlockMesh->SetStaticMesh(ConstructorStatics.PlaneMesh.Get());
-	BlockMesh->SetRelativeScale3D(FVector(1.f,1.f,0.02f));
+	BlockMesh->SetRelativeScale3D(FVector(1.f,1.f,0.01f));
 	BlockMesh->SetRelativeLocation(FVector(0.f,0.f,25.f));
 	BlockMesh->SetMaterial(0, ConstructorStatics.BlueMaterial.Get());
 	BlockMesh->AttachTo(DummyRoot);
@@ -37,6 +36,9 @@ AFinalProjectBlock::AFinalProjectBlock()
 
 	// Save a pointer to the orange material
 	OrangeMaterial = ConstructorStatics.OrangeMaterial.Get();
+    this->unit = NULL;
+    this->row = 0;
+    this->column = 0;
 }
 
 void AFinalProjectBlock::BlockClicked(UPrimitiveComponent* ClickedComp)
@@ -50,10 +52,10 @@ void AFinalProjectBlock::BlockClicked(UPrimitiveComponent* ClickedComp)
 		BlockMesh->SetMaterial(0, OrangeMaterial);
 
 		// Tell the Grid
-		if(OwningGrid != NULL)
+		/*if(OwningGrid != NULL)
 		{
 			OwningGrid->AddScore();
-		}
+		}*/
 	}
 }
 

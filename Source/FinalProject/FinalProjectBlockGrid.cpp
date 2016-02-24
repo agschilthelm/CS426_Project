@@ -2,7 +2,6 @@
 
 #include "FinalProject.h"
 #include "FinalProjectBlockGrid.h"
-#include "FinalProjectBlock.h"
 #include "Components/TextRenderComponent.h"
 
 #define LOCTEXT_NAMESPACE "PuzzleBlockGrid"
@@ -21,8 +20,15 @@ AFinalProjectBlockGrid::AFinalProjectBlockGrid()
 	ScoreText->AttachTo(DummyRoot);
 
 	// Set defaults
-	Size = 3;
-	BlockSpacing = 300.f;
+    rows = 8;
+    columns = 8;
+    Size = rows;
+	BlockSpacing = 275.f;
+    //grid[Size][Size];
+    
+    this->grid = new AFinalProjectBlock**[rows];
+    for (int i = 0; i < rows; ++i)
+        grid[i] = new AFinalProjectBlock*[columns];
 }
 
 
@@ -31,10 +37,35 @@ void AFinalProjectBlockGrid::BeginPlay()
 	Super::BeginPlay();
 
 	// Number of blocks
-	const int32 NumBlocks = Size * Size;
+    int cnt = 0;
+    
+    for(int i = 0; i < rows; i++)
+    {
+        for(int j = 0; j < columns; j++)
+        {
+            const float XOffset = (cnt/Size) * BlockSpacing; // Divide by dimension
+            const float YOffset = (cnt%Size) * BlockSpacing; // Modulo gives remainder
+            cnt++;
+            // Make postion vector, offset from Grid location
+            const FVector BlockLocation = FVector(XOffset, YOffset, 0.f) + GetActorLocation();
+            
+            // Spawn a block
+            AFinalProjectBlock* NewBlock = GetWorld()->SpawnActor<AFinalProjectBlock>(BlockLocation, FRotator(0,0,0));
+            NewBlock->BlockLocation = BlockLocation;
+            
+            // Tell the block about its owner
+            if(NewBlock != NULL)
+            {
+                //NewBlock->OwningGrid = this;
+                grid[i][j] = NewBlock;
+                NewBlock->row = i;
+                NewBlock->column = j;
+            }
+        }
+    }
 
 	// Loop to spawn each block
-	for(int32 BlockIndex=0; BlockIndex<NumBlocks; BlockIndex++)
+	/*for(int32 BlockIndex=0; BlockIndex<NumBlocks; BlockIndex++)
 	{
 		const float XOffset = (BlockIndex/Size) * BlockSpacing; // Divide by dimension
 		const float YOffset = (BlockIndex%Size) * BlockSpacing; // Modulo gives remainder
@@ -50,7 +81,7 @@ void AFinalProjectBlockGrid::BeginPlay()
 		{
 			NewBlock->OwningGrid = this;
 		}
-	}
+	}*/
 }
 
 
@@ -61,6 +92,123 @@ void AFinalProjectBlockGrid::AddScore()
 
 	// Update text
 	ScoreText->SetText(FText::Format(LOCTEXT("ScoreFmt", "Score: {0}"), FText::AsNumber(Score)));
+}
+
+AFinalProjectBlock* AFinalProjectBlockGrid::getNode(int row, int column)
+{
+    return this->grid[row][column];
+}
+
+AFinalProjectBlock* AFinalProjectBlockGrid::getNorthNode(AFinalProjectBlock* node)
+{
+    int row = node->row;
+    int col = node->column;
+    if (row == 0)
+    {
+        return NULL;
+    }
+    else
+    {
+        return getNode(row - 1, col);
+    }
+}
+
+AFinalProjectBlock* AFinalProjectBlockGrid::getSouthNode(AFinalProjectBlock* node)
+{
+    int row = node->row;
+    int col = node->column;
+    if (row == 0)
+    {
+        return NULL;
+    }
+    else
+    {
+        return getNode(row + 1, col);
+    }
+}
+
+AFinalProjectBlock* AFinalProjectBlockGrid::getEastNode(AFinalProjectBlock* node)
+{
+    int row = node->row;
+    int col = node->column;
+    if (row == 0)
+    {
+        return NULL;
+    }
+    else
+    {
+        return getNode(row, col + 1);
+    }
+}
+
+AFinalProjectBlock* AFinalProjectBlockGrid::getWestNode(AFinalProjectBlock* node)
+{
+    int row = node->row;
+    int col = node->column;
+    if (row == 0)
+    {
+        return NULL;
+    }
+    else
+    {
+        return getNode(row, col - 1);
+    }
+}
+
+AFinalProjectBlock* AFinalProjectBlockGrid::getNorthEastNode(AFinalProjectBlock* node)
+{
+    int row = node->row;
+    int col = node->column;
+    if (row == 0)
+    {
+        return NULL;
+    }
+    else
+    {
+        return getNode(row - 1, col + 1);
+    }
+}
+
+AFinalProjectBlock* AFinalProjectBlockGrid::getNorthWestNode(AFinalProjectBlock* node)
+{
+    int row = node->row;
+    int col = node->column;
+    if (row == 0)
+    {
+        return NULL;
+    }
+    else
+    {
+        return getNode(row - 1, col - 1);
+    }
+}
+
+AFinalProjectBlock* AFinalProjectBlockGrid::getSouthEastNode(AFinalProjectBlock* node)
+{
+    int row = node->row;
+    int col = node->column;
+    if (row == 0)
+    {
+        return NULL;
+    }
+    else
+    {
+        return getNode(row + 1, col + 1);
+    }
+}
+
+AFinalProjectBlock* AFinalProjectBlockGrid::getSouthWestNode(AFinalProjectBlock* node)
+{
+    int row = node->row;
+    int col = node->column;
+    if (row == 0)
+    {
+        return NULL;
+    }
+    else
+    {
+        return getNode(row + 1, col - 1);
+    }
 }
 
 #undef LOCTEXT_NAMESPACE

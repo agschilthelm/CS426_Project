@@ -1,8 +1,10 @@
 // Copyright 1998-2015 Epic Games, Inc. All Rights Reserved.
 #pragma once
 #include "GameFramework/Actor.h"
+#include "FinalProjectBlock.h"
 #include "FinalProjectBlockGrid.generated.h"
 
+class AFinalProjectBlock;
 /** Class used to spawn blocks and manage score */
 UCLASS(minimalapi)
 class AFinalProjectBlockGrid : public AActor
@@ -18,10 +20,18 @@ class AFinalProjectBlockGrid : public AActor
 	class UTextRenderComponent* ScoreText;
 
 public:
+    //grid to hold the blocks
+    //AFinalProjectBlock grid[][];
+    
+    AFinalProjectBlock*** grid;
+    
 	AFinalProjectBlockGrid();
 
 	/** How many blocks have been clicked */
 	int32 Score;
+    
+    int rows;
+    int columns;
 
 	/** Number of blocks along each side of grid */
 	UPROPERTY(Category=Grid, EditAnywhere, BlueprintReadOnly)
@@ -37,6 +47,18 @@ public:
 
 	/** Handle the block being clicked */
 	void AddScore();
+    
+    //getters for the grid node and its neighbors
+    AFinalProjectBlock* getNode(int row, int column);
+    AFinalProjectBlock* getNorthNode(AFinalProjectBlock* node);
+    AFinalProjectBlock* getSouthNode(AFinalProjectBlock* node);
+    AFinalProjectBlock* getEastNode(AFinalProjectBlock* node);
+    AFinalProjectBlock* getWestNode(AFinalProjectBlock* node);
+    AFinalProjectBlock* getNorthEastNode(AFinalProjectBlock* node);
+    AFinalProjectBlock* getNorthWestNode(AFinalProjectBlock* node);
+    AFinalProjectBlock* getSouthEastNode(AFinalProjectBlock* node);
+    AFinalProjectBlock* getSouthWestNode(AFinalProjectBlock* node);
+    
 
 public:
 	/** Returns DummyRoot subobject **/
