@@ -18,6 +18,10 @@ class AFinalProjectBlockGrid : public AActor
 	/** Text component for the score */
 	UPROPERTY(Category = Grid, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UTextRenderComponent* ScoreText;
+	/* Gird instace*/
+	UPROPERTY(Category = Grid, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class AFinalProjectBlockGrid* BlockGrid;
+	
 
 public:
     //grid to hold the blocks
@@ -47,7 +51,10 @@ public:
 	// End AActor interface
 
 	/** Handle the block being clicked */
-	void AddScore();
+	void SetActive(int r, int c);
+
+	UFUNCTION(BlueprintCallable, Category = "Blocks")
+	void setUnit();
     
     //getters for the grid node and its neighbors
     AFinalProjectBlock* getNode(int row, int column);
@@ -66,6 +73,9 @@ public:
 	FORCEINLINE class USceneComponent* GetDummyRoot() const { return DummyRoot; }
 	/** Returns ScoreText subobject **/
 	FORCEINLINE class UTextRenderComponent* GetScoreText() const { return ScoreText; }
+	/* Returns Grid object*/
+	FORCEINLINE class AFinalProjectBlockGrid* GetGridRef() { return this; }
+
 };
 
 

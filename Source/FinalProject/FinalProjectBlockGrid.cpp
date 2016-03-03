@@ -3,6 +3,7 @@
 #include "FinalProject.h"
 #include "FinalProjectBlockGrid.h"
 #include "Components/TextRenderComponent.h"
+#include "Unit.h"
 
 #define LOCTEXT_NAMESPACE "PuzzleBlockGrid"
 
@@ -29,6 +30,7 @@ AFinalProjectBlockGrid::AFinalProjectBlockGrid()
     this->grid = new AFinalProjectBlock**[rows];
     for (int i = 0; i < rows; ++i)
         grid[i] = new AFinalProjectBlock*[columns];
+
 }
 
 
@@ -85,13 +87,44 @@ void AFinalProjectBlockGrid::BeginPlay()
 }
 
 
-void AFinalProjectBlockGrid::AddScore()
+void AFinalProjectBlockGrid::SetActive(int r, int c)
 {
-	// Increment score
-	Score++;
+	selectedBlock->Unselect();
+	selectedBlock = getNode(r,c);
+}
 
-	// Update text
-	ScoreText->SetText(FText::Format(LOCTEXT("ScoreFmt", "Score: {0}"), FText::AsNumber(Score)));
+void AFinalProjectBlockGrid::setUnit(){
+	if (selectedBlock == nullptr) {
+		return;
+	}
+	int u = 88;
+	AUnit *unit;
+	switch (u) {
+	case 0:
+		//King
+		unit = new AUnit();
+		break;
+	case 1:
+		//Knight
+		unit = new AUnit("knight", selectedBlock);
+		break;
+	case 2:
+		//Soldier
+		unit = new AUnit("soldier", selectedBlock);
+		break;
+	case 3:
+		//Assassin
+		unit = new AUnit("assasin", selectedBlock);
+		break;
+	case 4:
+		//Scout
+		unit = new AUnit("scout", selectedBlock);
+		break;
+	default:
+		unit = new AUnit("scout", selectedBlock);
+		break;
+	}
+	selectedBlock->setUnit(unit);
 }
 
 AFinalProjectBlock* AFinalProjectBlockGrid::getNode(int row, int column)

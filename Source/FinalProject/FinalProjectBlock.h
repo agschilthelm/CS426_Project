@@ -19,6 +19,10 @@ class AFinalProjectBlock : public AActor
 	UPROPERTY(Category = Block, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UStaticMeshComponent* BlockMesh;
 
+	/* Gird instace*/
+	UPROPERTY(Category = Grid, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	class AFinalProjectBlockGrid* BlockGrid;
+
 public:
     
     //unit currently occupying this block
@@ -37,13 +41,21 @@ public:
 	UPROPERTY()
 	class UMaterialInstance* OrangeMaterial;
 
+	/** Pointer to Blue material used on active blocks */
+	UPROPERTY()
+	class UMaterialInstance* BlueMaterial;
+
+
 	/** Grid that owns us */
-	/*UPROPERTY()
-	class AFinalProjectBlockGrid* OwningGrid;*/
+	UPROPERTY()
+	class AFinalProjectBlockGrid* OwningGrid;
 
 	/** Handle the block being clicked */
 	UFUNCTION()
 	void BlockClicked(UPrimitiveComponent* ClickedComp);
+
+	UFUNCTION()
+	void Unselect();
 
 	/** Handle the block being touched  */
 	UFUNCTION()
@@ -54,6 +66,8 @@ public:
 	FORCEINLINE class USceneComponent* GetDummyRoot() const { return DummyRoot; }
 	/** Returns BlockMesh subobject **/
 	FORCEINLINE class UStaticMeshComponent* GetBlockMesh() const { return BlockMesh; }
+	/* Returns Grid object*/
+	FORCEINLINE class AFinalProjectBlockGrid* GetGridRef() const { return OwningGrid; }
 };
 
 

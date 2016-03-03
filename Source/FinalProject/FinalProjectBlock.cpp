@@ -2,6 +2,7 @@
 
 #include "FinalProject.h"
 #include "FinalProjectBlock.h"
+#include "FinalProjectBlockGrid.h"
 
 AFinalProjectBlock::AFinalProjectBlock()
 {
@@ -36,6 +37,7 @@ AFinalProjectBlock::AFinalProjectBlock()
 
 	// Save a pointer to the orange material
 	OrangeMaterial = ConstructorStatics.OrangeMaterial.Get();
+	BlueMaterial = ConstructorStatics.BlueMaterial.Get();
     this->unit = NULL;
     this->row = 0;
     this->column = 0;
@@ -54,13 +56,25 @@ void AFinalProjectBlock::BlockClicked(UPrimitiveComponent* ClickedComp)
 		BlockMesh->SetMaterial(0, OrangeMaterial);
 
 		// Tell the Grid
-		/*if(OwningGrid != NULL)
+		if(OwningGrid != NULL)
 		{
-			OwningGrid->AddScore();
-		}*/
+			OwningGrid->SetActive(row, column);
+		}
+	}
+	else {
+		bIsActive = false;
+
+		// Change material
+		BlockMesh->SetMaterial(0, BlueMaterial);
+
+
 	}
 }
 
+void AFinalProjectBlock::Unselect(){
+	bIsActive = false;
+	BlockMesh->SetMaterial(0, BlueMaterial);
+}
 
 void AFinalProjectBlock::OnFingerPressedBlock(ETouchIndex::Type FingerIndex, UPrimitiveComponent* TouchedComponent)
 {
