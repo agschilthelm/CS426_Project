@@ -23,7 +23,7 @@ AFinalProjectBlockGrid::AFinalProjectBlockGrid()
     rows = 8;
     columns = 8;
     Size = rows;
-	BlockSpacing = 275.f;
+	BlockSpacing = 270.f;
     //grid[Size][Size];
     
     this->grid = new AFinalProjectBlock**[rows];
@@ -101,6 +101,8 @@ AFinalProjectBlock* AFinalProjectBlockGrid::getNode(int row, int column)
 
 AFinalProjectBlock* AFinalProjectBlockGrid::getNorthNode(AFinalProjectBlock* node)
 {
+    if(node == NULL)
+        return NULL;
     int row = node->row;
     int col = node->column;
     if (row == 0)
@@ -117,7 +119,7 @@ AFinalProjectBlock* AFinalProjectBlockGrid::getSouthNode(AFinalProjectBlock* nod
 {
     int row = node->row;
     int col = node->column;
-    if (row == 0)
+    if (row == this->rows)
     {
         return NULL;
     }
@@ -131,7 +133,7 @@ AFinalProjectBlock* AFinalProjectBlockGrid::getEastNode(AFinalProjectBlock* node
 {
     int row = node->row;
     int col = node->column;
-    if (row == 0)
+    if (col == this->columns)
     {
         return NULL;
     }
@@ -145,7 +147,7 @@ AFinalProjectBlock* AFinalProjectBlockGrid::getWestNode(AFinalProjectBlock* node
 {
     int row = node->row;
     int col = node->column;
-    if (row == 0)
+    if (col == this->columns)
     {
         return NULL;
     }
@@ -159,7 +161,7 @@ AFinalProjectBlock* AFinalProjectBlockGrid::getNorthEastNode(AFinalProjectBlock*
 {
     int row = node->row;
     int col = node->column;
-    if (row == 0)
+    if (row == this->rows || col == 0)
     {
         return NULL;
     }
@@ -173,7 +175,7 @@ AFinalProjectBlock* AFinalProjectBlockGrid::getNorthWestNode(AFinalProjectBlock*
 {
     int row = node->row;
     int col = node->column;
-    if (row == 0)
+    if (row == 0 || col == 0)
     {
         return NULL;
     }
@@ -187,7 +189,7 @@ AFinalProjectBlock* AFinalProjectBlockGrid::getSouthEastNode(AFinalProjectBlock*
 {
     int row = node->row;
     int col = node->column;
-    if (row == 0)
+    if (row == this->rows || col == this->columns)
     {
         return NULL;
     }
@@ -201,7 +203,7 @@ AFinalProjectBlock* AFinalProjectBlockGrid::getSouthWestNode(AFinalProjectBlock*
 {
     int row = node->row;
     int col = node->column;
-    if (row == 0)
+    if (row == 0 || col == 0)
     {
         return NULL;
     }

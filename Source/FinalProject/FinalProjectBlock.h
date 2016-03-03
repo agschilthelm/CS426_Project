@@ -25,8 +25,10 @@ public:
     AUnit* unit;
     int row;
     int column;
+    bool clear; //if the node is occupied by a unit
+    bool selected; //for placing units, only one block should be selected at any time.
 	AFinalProjectBlock();
-    
+    void setUnit(AUnit* unit);
     FVector BlockLocation;
 	/** Are we currently active? */
 	bool bIsActive;

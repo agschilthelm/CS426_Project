@@ -12,7 +12,7 @@ AUnit::AUnit()
 
 }
 
-AUnit::AUnit(std::string type)
+AUnit::AUnit(std::string type, AFinalProjectBlock* node)
 {
     
     this->type = type;
@@ -26,7 +26,7 @@ AUnit::AUnit(std::string type)
         ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> BlueMaterial;
         ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> OrangeMaterial;
         FConstructorStatics()
-        : PlaneMesh(TEXT("/Game/Puzzle/Meshes/Cone.Cone"))
+        : PlaneMesh(TEXT("/Game/Puzzle/Meshes/Cone.Cone")) //change these meshes and materials for each unit type
         , BlueMaterial(TEXT("/Game/Puzzle/Meshes/BlueMaterial.BlueMaterial"))
         , OrangeMaterial(TEXT("/Game/Puzzle/Meshes/OrangeMaterial.OrangeMaterial"))
         {
@@ -47,6 +47,8 @@ AUnit::AUnit(std::string type)
     mesh->AttachTo(DummyRoot);
     
     this->grid = NULL;
+    this->currentNode = node;
+    this->movedLeft = false;
 
 }
 
@@ -73,31 +75,79 @@ void AUnit::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 
 void AUnit::move()
 {
-    AFinalProjectBlock* node;
+    AFinalProjectBlock* destination;
+    destination = grid->getNorthNode(currentNode);
+    if(destination == NULL) //if the unit has hit the other side of the board do nothing (for now)
+        return;
     
     if (type == "soldier")
     {
-        
+        if(checkSoldiers())
+            destination = grid->getNorthNode(currentNode);
+        else
+        {
+            //TO DO - find closest node with a soldier in it and move one space closer
+        }
     }
     else if(type == "knight")
     {
-        
+        if(movedLeft)
+        {
+            destination = grid->getNorthEastNode(currentNode);
+        }
+        else
+        {
+            destination = grid->getNorthWestNode(currentNode);
+        }
+        movedLeft = !movedLeft;
+        if(destination == NULL)
+            this->move(); //if the knight hits the side of the board then go the other way
     }
     else if(type == "scout")
     {
-        
+        destination = grid->getNorthNode(grid->getNorthNode(currentNode)); //scout moves 2 spaces forward
     }
     else if(type == "assassin")
     {
-        
+        //finds shortest path to enemy king when spawned and moves one space along it
     }
-    else if(type == "guard")
+    else //its a guard or king
     {
-        
+        destination = currentNode;
     }
-    else if(type == "king")
+    if(destination->clear)
     {
+        destination->unit = this;
+        destination->clear = false;
+        this->currentNode = destination;
+        //TO DO - translate the unit in the game
+    }
+    else
+    {
+        //TO DO - deal with conflicts if node is occupied by friendly or enemy
         
     }
+}
+
+bool AUnit::checkSoldiers()
+{
+    AFinalProjectBlock* neighbor;
+    neighbor = grid->getNorthNode(currentNode);
+    if(neighbor && neighbor->unit->type == "soldier")
+        return true;
+    
+    neighbor = grid->getSouthNode(currentNode);
+    if(neighbor && neighbor->unit->type == "soldier")
+        return true;
+    
+    neighbor = grid->getEastNode(currentNode);
+    if(neighbor && neighbor->unit->type == "soldier")
+        return true;
+    
+    neighbor = grid->getWestNode(currentNode);
+    if(neighbor && neighbor->unit->type == "soldier")
+        return true;
+    
+    return false;
 }
 

@@ -32,7 +32,8 @@ public:
     
     int rows;
     int columns;
-
+    AFinalProjectBlock* selectedBlock;
+    
 	/** Number of blocks along each side of grid */
 	UPROPERTY(Category=Grid, EditAnywhere, BlueprintReadOnly)
 	int32 Size;

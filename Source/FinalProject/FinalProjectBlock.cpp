@@ -39,6 +39,8 @@ AFinalProjectBlock::AFinalProjectBlock()
     this->unit = NULL;
     this->row = 0;
     this->column = 0;
+    this->clear = true;
+    this->selected = false;
 }
 
 void AFinalProjectBlock::BlockClicked(UPrimitiveComponent* ClickedComp)
@@ -63,4 +65,11 @@ void AFinalProjectBlock::BlockClicked(UPrimitiveComponent* ClickedComp)
 void AFinalProjectBlock::OnFingerPressedBlock(ETouchIndex::Type FingerIndex, UPrimitiveComponent* TouchedComponent)
 {
 	BlockClicked(TouchedComponent);
+}
+
+void AFinalProjectBlock::setUnit(AUnit* unit)
+{
+    this->unit = unit;
+    this->clear = false;
+    //TO DO - set the location of the unit based on the location of the block
 }

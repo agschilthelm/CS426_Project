@@ -2,6 +2,7 @@
 
 #include "FinalProject.h"
 #include "FinalProjectGameMode.h"
+#include <iostream>
 #include "FinalProjectPlayerController.h"
 
 AFinalProjectGameMode::AFinalProjectGameMode()
@@ -10,4 +11,9 @@ AFinalProjectGameMode::AFinalProjectGameMode()
 	DefaultPawnClass = NULL;
 	// use our own player controller class
 	PlayerControllerClass = AFinalProjectPlayerController::StaticClass();
+}
+
+void AFinalProjectGameMode::endTurn()
+{
+    std::cout << "end turn!";
 }

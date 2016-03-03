@@ -11,6 +11,9 @@ class AFinalProjectGameMode : public AGameMode
 
 public:
 	AFinalProjectGameMode();
+    
+    UFUNCTION(BlueprintCallable, Category="GameMode Functions")
+    static void endTurn();
 };
 
 

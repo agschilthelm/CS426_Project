@@ -25,18 +25,21 @@ class FINALPROJECT_API AUnit : public APawn
 public:
     int strength;
     int cost;
+    bool movedLeft; //used for tracking the knights previous movestep
     std::string type;
     
     int rowLocation;
     int columnLocation;
     AFinalProjectBlockGrid* grid;
+    AFinalProjectBlock* currentNode;
     
     //executes the units movement based on the rules
     void move();
-    
+    //used for soldiers checks for adjacent soldiers
+    bool checkSoldiers();
 	// Sets default values for this pawn's properties
 	AUnit();
-    AUnit(std::string type);
+    AUnit(std::string type, AFinalProjectBlock* node);
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
