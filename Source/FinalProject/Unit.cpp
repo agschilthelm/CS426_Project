@@ -7,18 +7,7 @@
 // Sets default values
 AUnit::AUnit()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
-
-}
-
-AUnit::AUnit(std::string type, AFinalProjectBlock* node)
-{
-    
-    this->type = type;
-    this->strength = 1;
-    this->cost = 1;
-    
+    UE_LOG(LogTemp, Warning, TEXT("DEBUG: in unit constructor") );
     // Structure to hold one-time initialization
     struct FConstructorStatics
     {
@@ -35,18 +24,31 @@ AUnit::AUnit(std::string type, AFinalProjectBlock* node)
     
     static FConstructorStatics ConstructorStatics;
     // Create dummy root scene component
-    RootComponent = CreateDefaultSubobject<USceneComponent>(TEXT("Dummy0"));
+    DummyRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Dummy0"));
     RootComponent = DummyRoot;
+    
     
     // Create static mesh component
     mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("UnitMesh0"));
     mesh->SetStaticMesh(ConstructorStatics.PlaneMesh.Get());
-    mesh->SetRelativeScale3D(FVector(1.f,1.f,0.02f));
-    mesh->SetRelativeLocation(FVector(0.f,0.f,25.f));
+    mesh->SetRelativeScale3D(FVector(1.f,1.f,1.f));
+    mesh->SetRelativeLocation(FVector(0.f,0.f,30.f));
     mesh->SetMaterial(0, ConstructorStatics.OrangeMaterial.Get());
     mesh->AttachTo(DummyRoot);
+
+}
+
+void AUnit::initializ(std::string type, int strength, AFinalProjectBlock* node, AFinalProjectBlockGrid* grid, int row, int column)
+{
     
-    this->grid = NULL;
+    this->type = type;
+    this->strength = strength;
+    this->cost = 1;
+    
+    this->location = node->BlockLocation;
+    this->rowLocation = row;
+    this->columnLocation = column;
+    this->grid = grid;
     this->currentNode = node;
     this->movedLeft = false;
 

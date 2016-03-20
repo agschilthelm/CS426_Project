@@ -2,8 +2,10 @@
 #pragma once
 #include "GameFramework/Actor.h"
 #include "Unit.h"
+#include "Engine.h"
 #include "FinalProjectBlock.generated.h"
 
+class AFinalProjectBlockGrid;
 class AUnit;
 /** A block that can be clicked */
 UCLASS(minimalapi)
@@ -29,6 +31,8 @@ public:
     AUnit* unit;
     int row;
     int column;
+    float locationZ;
+    float sizeZ;
     bool clear; //if the node is occupied by a unit
     bool selected; //for placing units, only one block should be selected at any time.
 	AFinalProjectBlock();

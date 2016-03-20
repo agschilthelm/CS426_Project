@@ -6,6 +6,8 @@
 
 AFinalProjectBlock::AFinalProjectBlock()
 {
+    this->locationZ = 25.f;
+    this->sizeZ = 0.01f;
 	// Structure to hold one-time initialization
 	struct FConstructorStatics
 	{
@@ -28,8 +30,8 @@ AFinalProjectBlock::AFinalProjectBlock()
 	// Create static mesh component
 	BlockMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("BlockMesh0"));
 	BlockMesh->SetStaticMesh(ConstructorStatics.PlaneMesh.Get());
-	BlockMesh->SetRelativeScale3D(FVector(1.f,1.f,0.01f));
-	BlockMesh->SetRelativeLocation(FVector(0.f,0.f,25.f));
+	BlockMesh->SetRelativeScale3D(FVector(1.f,1.f,sizeZ));
+	BlockMesh->SetRelativeLocation(FVector(0.f,0.f,locationZ));
 	BlockMesh->SetMaterial(0, ConstructorStatics.BlueMaterial.Get());
 	BlockMesh->AttachTo(DummyRoot);
 	BlockMesh->OnClicked.AddDynamic(this, &AFinalProjectBlock::BlockClicked);
@@ -72,6 +74,8 @@ void AFinalProjectBlock::BlockClicked(UPrimitiveComponent* ClickedComp)
 }
 
 void AFinalProjectBlock::Unselect(){
+    //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("unselect"));
+    UE_LOG(LogTemp, Warning, TEXT("DEBUG: Unselect Block") );
 	bIsActive = false;
 	BlockMesh->SetMaterial(0, BlueMaterial);
 }
@@ -83,6 +87,7 @@ void AFinalProjectBlock::OnFingerPressedBlock(ETouchIndex::Type FingerIndex, UPr
 
 void AFinalProjectBlock::setUnit(AUnit* unit)
 {
+    UE_LOG(LogTemp, Warning, TEXT("DEBUG: set unit in block") );
     this->unit = unit;
     this->clear = false;
     //TO DO - set the location of the unit based on the location of the block

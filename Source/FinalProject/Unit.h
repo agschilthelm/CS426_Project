@@ -30,6 +30,7 @@ public:
     
     int rowLocation;
     int columnLocation;
+    FVector location;
     AFinalProjectBlockGrid* grid;
     AFinalProjectBlock* currentNode;
     
@@ -39,7 +40,9 @@ public:
     bool checkSoldiers();
 	// Sets default values for this pawn's properties
 	AUnit();
-    AUnit(std::string type, AFinalProjectBlock* node);
+    
+    //UFUNCTION()
+    void initializ(std::string type, int strength, AFinalProjectBlock* node, AFinalProjectBlockGrid* grid, int row, int column);
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

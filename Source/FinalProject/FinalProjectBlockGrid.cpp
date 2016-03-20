@@ -54,7 +54,7 @@ void AFinalProjectBlockGrid::BeginPlay()
             // Spawn a block
             AFinalProjectBlock* NewBlock = GetWorld()->SpawnActor<AFinalProjectBlock>(BlockLocation, FRotator(0,0,0));
             NewBlock->BlockLocation = BlockLocation;
-            
+            NewBlock->OwningGrid = this;
             // Tell the block about its owner
             if(NewBlock != NULL)
             {
@@ -89,42 +89,60 @@ void AFinalProjectBlockGrid::BeginPlay()
 
 void AFinalProjectBlockGrid::SetActive(int r, int c)
 {
-	selectedBlock->Unselect();
+    if(selectedBlock != NULL)
+        selectedBlock->Unselect();
 	selectedBlock = getNode(r,c);
 }
 
 void AFinalProjectBlockGrid::setUnit(){
-	if (selectedBlock == nullptr) {
+    //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("setUnit"));
+    
+	if (selectedBlock == NULL || selectedBlock->clear == false) {
 		return;
 	}
 	int u = 88;
 	AUnit *unit;
+    std::string type = "scout";
+    int strength;
 	switch (u) {
 	case 0:
 		//King
-		unit = new AUnit();
-		break;
+		//unit = new AUnit();
+        type = "king";
+        strength = 0;
 	case 1:
 		//Knight
-		unit = new AUnit("knight", selectedBlock);
-		break;
+		//unit = new AUnit("knight", selectedBlock, this);
+        type = "knight";
+        strength = 0;
 	case 2:
 		//Soldier
-		unit = new AUnit("soldier", selectedBlock);
-		break;
+		//unit = new AUnit("soldier", selectedBlock, this);
+        type = "soldier";
+        strength = 0;
 	case 3:
 		//Assassin
-		unit = new AUnit("assasin", selectedBlock);
-		break;
+		//unit = new AUnit("assasin", selectedBlock, this);
+        type = "assassin";
+        strength = 0;
 	case 4:
 		//Scout
-		unit = new AUnit("scout", selectedBlock);
-		break;
+		//unit = new AUnit("scout", selectedBlock, this);
+        type = "scout";
+        strength = 0;
 	default:
-		unit = new AUnit("scout", selectedBlock);
-		break;
+        UE_LOG(LogTemp, Warning, TEXT("in Grid::setUnit creating a unit") );
+		//unit = new AUnit("scout", selectedBlock, this);
+        type = "scout";
+        strength = 1;
 	}
+    FVector location = selectedBlock->BlockLocation;
+    location[2] += 100.0f;
+    UE_LOG(LogTemp, Warning, TEXT("DEBUG: block location: %f"), selectedBlock->BlockLocation[2]);
+    UE_LOG(LogTemp, Warning, TEXT("DEBUG: unit location: %f"), location[2]);
+    unit = GetWorld()->SpawnActor<AUnit>(location, FRotator(0,0,0));
 	selectedBlock->setUnit(unit);
+    selectedBlock->unit->initializ(type,strength,selectedBlock, this, selectedBlock->row, selectedBlock->column);
 }
 
 AFinalProjectBlock* AFinalProjectBlockGrid::getNode(int row, int column)
