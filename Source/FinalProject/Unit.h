@@ -34,6 +34,20 @@ public:
     AFinalProjectBlockGrid* grid;
     AFinalProjectBlock* currentNode;
     
+    /** Pointer to materials used on units */
+    UPROPERTY()
+    class UMaterialInstance* OrangeMaterial;
+    UPROPERTY()
+    class UMaterialInstance* BlueMaterial;
+    UPROPERTY()
+    class UMaterialInstance* WhiteMaterial;
+    UPROPERTY()
+    class UMaterialInstance* BlackMaterial;
+    UPROPERTY()
+    class UMaterialInstance* RedMaterial;
+    UPROPERTY()
+    class UMaterialInstance* GreenMaterial;
+    
     //executes the units movement based on the rules
     void move();
     //used for soldiers checks for adjacent soldiers

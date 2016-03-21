@@ -38,6 +38,9 @@ public:
     int columns;
     AFinalProjectBlock* selectedBlock;
     
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Grid)
+    FString selectedUnitType;
+    
 	/** Number of blocks along each side of grid */
 	UPROPERTY(Category=Grid, EditAnywhere, BlueprintReadOnly)
 	int32 Size;

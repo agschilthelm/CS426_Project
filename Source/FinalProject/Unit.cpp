@@ -14,10 +14,19 @@ AUnit::AUnit()
         ConstructorHelpers::FObjectFinderOptional<UStaticMesh> PlaneMesh;
         ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> BlueMaterial;
         ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> OrangeMaterial;
+        ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> WhiteMaterial;
+        ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> BlackMaterial;
+        ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> RedMaterial;
+        ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> GreenMaterial;
         FConstructorStatics()
         : PlaneMesh(TEXT("/Game/Puzzle/Meshes/Cone.Cone")) //change these meshes and materials for each unit type
         , BlueMaterial(TEXT("/Game/Puzzle/Meshes/BlueMaterial.BlueMaterial"))
         , OrangeMaterial(TEXT("/Game/Puzzle/Meshes/OrangeMaterial.OrangeMaterial"))
+        , WhiteMaterial(TEXT("/Game/Puzzle/Meshes/WhiteMaterial.WhiteMaterial"))
+        , BlackMaterial(TEXT("/Game/Puzzle/Meshes/BlackMaterial.BlackMaterial"))
+        , RedMaterial(TEXT("/Game/Puzzle/Meshes/RedMaterial.RedMaterial"))
+        , GreenMaterial(TEXT("/Game/Puzzle/Meshes/GreenMaterial.GreenMaterial"))
+        //add in other materials for unit diversification
         {
         }
     };
@@ -27,13 +36,19 @@ AUnit::AUnit()
     DummyRoot = CreateDefaultSubobject<USceneComponent>(TEXT("Dummy0"));
     RootComponent = DummyRoot;
     
-    
+    // Save a pointer to the orange material
+    OrangeMaterial = ConstructorStatics.OrangeMaterial.Get();
+    BlueMaterial = ConstructorStatics.BlueMaterial.Get();
+    WhiteMaterial = ConstructorStatics.WhiteMaterial.Get();
+    BlackMaterial = ConstructorStatics.BlackMaterial.Get();
+    RedMaterial = ConstructorStatics.RedMaterial.Get();
+    GreenMaterial = ConstructorStatics.GreenMaterial.Get();
     // Create static mesh component
     mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("UnitMesh0"));
     mesh->SetStaticMesh(ConstructorStatics.PlaneMesh.Get());
-    mesh->SetRelativeScale3D(FVector(1.f,1.f,1.f));
+    mesh->SetRelativeScale3D(FVector(1.5f,1.5f,1.5f));
     mesh->SetRelativeLocation(FVector(0.f,0.f,30.f));
-    mesh->SetMaterial(0, ConstructorStatics.OrangeMaterial.Get());
+    mesh->SetMaterial(0, WhiteMaterial);
     mesh->AttachTo(DummyRoot);
 
 }
