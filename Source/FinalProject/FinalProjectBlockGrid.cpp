@@ -112,18 +112,28 @@ void AFinalProjectBlockGrid::setUnit(){
         type = "scout";
         strength = 0;
 	default:
-        UE_LOG(LogTemp, Warning, TEXT("in Grid::setUnit creating a unit") );
-		//unit = new AUnit("scout", selectedBlock, this);
         type = "scout";
         strength = 1;
 	}
     FVector location = selectedBlock->BlockLocation;
-    location[2] += 100.0f;
-    UE_LOG(LogTemp, Warning, TEXT("DEBUG: block location: %f"), selectedBlock->BlockLocation[2]);
-    UE_LOG(LogTemp, Warning, TEXT("DEBUG: unit location: %f"), location[2]);
+    location[2] += 100.0f; //offset so theres no collison trying to spawn
     unit = GetWorld()->SpawnActor<AUnit>(location, FRotator(0,0,0));
 	selectedBlock->setUnit(unit);
     selectedBlock->unit->initializ(type,strength,selectedBlock, this, selectedBlock->row, selectedBlock->column);
+    //this->unitList.push_back(unit);
+}
+
+void AFinalProjectBlockGrid::moveUnits()
+{
+    //iterate through blocks and call their movement
+    for(int i = 0; i < rows; i++)
+    {
+        for(int j = 0; j < columns; j++)
+        {
+            if(grid[i][j]->unit)
+                grid[i][j]->unit->move();
+        }
+    }
 }
 
 AFinalProjectBlock* AFinalProjectBlockGrid::getNode(int row, int column)

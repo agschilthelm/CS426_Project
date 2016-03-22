@@ -66,6 +66,7 @@ void AUnit::initializ(std::string type, int strength, AFinalProjectBlock* node, 
     this->grid = grid;
     this->currentNode = node;
     this->movedLeft = false;
+    this->hasMoved = false;
 
 }
 
@@ -92,6 +93,11 @@ void AUnit::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 
 void AUnit::move()
 {
+    if(hasMoved)
+    {
+        hasMoved = !hasMoved;
+        return;
+    }
     AFinalProjectBlock* destination;
     destination = grid->getNorthNode(currentNode);
     if(destination == NULL) //if the unit has hit the other side of the board do nothing (for now)
@@ -123,6 +129,8 @@ void AUnit::move()
     else if(type == "scout")
     {
         destination = grid->getNorthNode(grid->getNorthNode(currentNode)); //scout moves 2 spaces forward
+        if(destination == NULL)
+            return;
     }
     else if(type == "assassin")
     {
@@ -132,18 +140,25 @@ void AUnit::move()
     {
         destination = currentNode;
     }
-    if(destination->clear)
+    if(destination && destination->clear)
     {
         destination->unit = this;
         destination->clear = false;
+        this->currentNode->clear = true;
         this->currentNode = destination;
-        //TO DO - translate the unit in the game
+        //FVector ActorLocation = GetActorLocation();
+        FVector BlockLocation = destination->GetActorLocation();
+        // Move it slightly
+        BlockLocation.Z += 100.0f;
+        // Set the location- this will blindly place the actor at the given location
+        SetActorLocation( BlockLocation, false );
     }
     else
     {
         //TO DO - deal with conflicts if node is occupied by friendly or enemy
         
     }
+    hasMoved = !hasMoved;
 }
 
 bool AUnit::checkSoldiers()
