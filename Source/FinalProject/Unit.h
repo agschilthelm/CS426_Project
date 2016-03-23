@@ -26,6 +26,7 @@ public:
     int strength;
     int cost;
     bool movedLeft; //used for tracking the knights previous movestep
+    bool hasMoved; //tracks if the unit has moved this turn
     std::string type;
     
     int rowLocation;

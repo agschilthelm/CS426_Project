@@ -39,6 +39,9 @@ public:
     int columns;
     AFinalProjectBlock* selectedBlock;
     
+    //list of units
+    //std::list<AUnit*> unitList;
+    
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Grid)
     FString selectedUnitType;
     
@@ -59,6 +62,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Blocks")
 	void setUnit(int32 u);
+    
+    UFUNCTION(BlueprintCallable, Category = "Units")
+    void moveUnits();
     
     //getters for the grid node and its neighbors
     AFinalProjectBlock* getNode(int row, int column);
