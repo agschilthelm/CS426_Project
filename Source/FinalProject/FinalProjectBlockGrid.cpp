@@ -75,47 +75,44 @@ void AFinalProjectBlockGrid::SetActive(int r, int c)
 	selectedBlock = getNode(r,c);
 }
 
-void AFinalProjectBlockGrid::setUnit(){
+void AFinalProjectBlockGrid::setUnit(int32 u){
     //GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("setUnit"));
     
 	if (selectedBlock == NULL || selectedBlock->clear == false) {
 		return;
 	}
-	int u = 88;
+	//int u = 88;
 	AUnit *unit;
     std::string type = "scout";
     int strength;
-	switch (u) {
+	if (u == 3)
+		UE_LOG(LogTemp, Warning, TEXT("ASSASSIN CREATING!!!\n"));
+
+	switch ((int)u) {
 	case 0:
 		//King
-		//unit = new AUnit();
         type = "king";
         strength = 0;
+		break;
 	case 1:
 		//Knight
-		//unit = new AUnit("knight", selectedBlock, this);
-        type = "knight";
         strength = 0;
+		break;
 	case 2:
 		//Soldier
-		//unit = new AUnit("soldier", selectedBlock, this);
-        type = "soldier";
         strength = 0;
+		break;
 	case 3:
 		//Assassin
-		//unit = new AUnit("assasin", selectedBlock, this);
-        type = "assassin";
         strength = 0;
+		break;
 	case 4:
 		//Scout
-		//unit = new AUnit("scout", selectedBlock, this);
-        type = "scout";
         strength = 0;
+		break;
 	default:
-        UE_LOG(LogTemp, Warning, TEXT("in Grid::setUnit creating a unit") );
-		//unit = new AUnit("scout", selectedBlock, this);
-        type = "scout";
-        strength = 1;
+        UE_LOG(LogTemp, Warning, TEXT("in Grid: INVALID UNIT TYPE %d\n"), u);
+		return;
 	}
     FVector location = selectedBlock->BlockLocation;
     location[2] += 100.0f;
@@ -123,7 +120,7 @@ void AFinalProjectBlockGrid::setUnit(){
     UE_LOG(LogTemp, Warning, TEXT("DEBUG: unit location: %f"), location[2]);
     unit = GetWorld()->SpawnActor<AUnit>(location, FRotator(0,0,0));
 	selectedBlock->setUnit(unit);
-    selectedBlock->unit->initializ(type,strength,selectedBlock, this, selectedBlock->row, selectedBlock->column);
+    selectedBlock->unit->initializ(u,strength,selectedBlock, this, selectedBlock->row, selectedBlock->column);
 }
 
 AFinalProjectBlock* AFinalProjectBlockGrid::getNode(int row, int column)

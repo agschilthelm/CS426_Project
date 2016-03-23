@@ -18,6 +18,7 @@ class AFinalProjectBlockGrid : public AActor
 	/** Text component for the score */
 	UPROPERTY(Category = Grid, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UTextRenderComponent* ScoreText;
+
 	/* Gird instace*/
 	UPROPERTY(Category = Grid, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class AFinalProjectBlockGrid* BlockGrid;
@@ -57,7 +58,7 @@ public:
 	void SetActive(int r, int c);
 
 	UFUNCTION(BlueprintCallable, Category = "Blocks")
-	void setUnit();
+	void setUnit(int32 u);
     
     //getters for the grid node and its neighbors
     AFinalProjectBlock* getNode(int row, int column);

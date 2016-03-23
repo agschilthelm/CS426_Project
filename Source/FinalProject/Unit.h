@@ -56,7 +56,7 @@ public:
 	AUnit();
     
     //UFUNCTION()
-    void initializ(std::string type, int strength, AFinalProjectBlock* node, AFinalProjectBlockGrid* grid, int row, int column);
+    void initializ(int u, int strength, AFinalProjectBlock* node, AFinalProjectBlockGrid* grid, int row, int column);
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

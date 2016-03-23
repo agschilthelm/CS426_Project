@@ -53,12 +53,46 @@ AUnit::AUnit()
 
 }
 
-void AUnit::initializ(std::string type, int strength, AFinalProjectBlock* node, AFinalProjectBlockGrid* grid, int row, int column)
+void AUnit::initializ(int u, int strength, AFinalProjectBlock* node, AFinalProjectBlockGrid* grid, int row, int column)
 {
     
-    this->type = type;
+	switch (u) {
+	case 0:
+		//King
+		type = "king";
+		cost = 0;
+		mesh->SetMaterial(0, BlueMaterial);
+		break;
+	case 1:
+		//Knight
+		type = "knight";
+		cost = 5;
+		mesh->SetMaterial(0, OrangeMaterial);
+		break;
+	case 2:
+		//Soldier
+		type = "soldier";
+		cost = 2;
+		mesh->SetMaterial(0, WhiteMaterial);
+		break;
+	case 3:
+		//Assassin
+		type = "assassin";
+		cost = 4;
+		mesh->SetMaterial(0, BlackMaterial);
+		break;
+	case 4:
+		//Scout
+		type = "scout";
+		cost = 1;
+		mesh->SetMaterial(0, RedMaterial);
+		break;
+	default:
+		UE_LOG(LogTemp, Warning, TEXT("In Unit: Invalid Unit Type %d"),u);
+		return;
+	}
+
     this->strength = strength;
-    this->cost = 1;
     
     this->location = node->BlockLocation;
     this->rowLocation = row;
