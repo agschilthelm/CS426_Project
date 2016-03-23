@@ -33,6 +33,18 @@ AFinalProjectBlockGrid::AFinalProjectBlockGrid()
 
 }
 
+void AFinalProjectBlockGrid::moveUnits() {
+	UE_LOG(LogTemp, Warning, TEXT("MOVING UNITS!!!\n"));
+	//iterate through blocks and call their movement
+	for (int i = 0; i < rows; i++)
+	{
+		for (int j = 0; j < columns; j++)
+		{
+			if (grid[i][j]->unit)
+				grid[i][j]->unit->move();
+		}
+	}
+}
 
 void AFinalProjectBlockGrid::BeginPlay()
 {
