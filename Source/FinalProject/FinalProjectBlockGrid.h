@@ -58,7 +58,8 @@ public:
 	// End AActor interface
 
 	/** Handle the block being clicked */
-	void SetActive(int r, int c);
+	UFUNCTION(BlueprintCallable, Category = "Blocks")
+	void SetActive(int32 r, int32 c);
 
 	UFUNCTION(BlueprintCallable, Category = "Blocks")
 	void setUnit(int32 u);
