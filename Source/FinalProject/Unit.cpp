@@ -55,7 +55,6 @@ AUnit::AUnit()
 
 void AUnit::initializ(int u, int strength, AFinalProjectBlock* node, AFinalProjectBlockGrid* grid, int row, int column)
 {
-    
 	switch (u) {
 	case 0:
 		//King
@@ -87,6 +86,11 @@ void AUnit::initializ(int u, int strength, AFinalProjectBlock* node, AFinalProje
 		cost = 1;
 		mesh->SetMaterial(0, RedMaterial);
 		break;
+	case 5:
+		//Guard
+		type = "guard";
+		cost = 5;
+		mesh->SetMaterial(0, GreenMaterial);
 	default:
 		UE_LOG(LogTemp, Warning, TEXT("In Unit: Invalid Unit Type %d"),u);
 		return;

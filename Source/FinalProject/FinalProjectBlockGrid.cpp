@@ -81,7 +81,7 @@ void AFinalProjectBlockGrid::BeginPlay()
 
 }
 
-void AFinalProjectBlockGrid::SetActive(int r, int c)
+void AFinalProjectBlockGrid::SetActive(int32 r, int32 c)
 {
     if(selectedBlock != NULL)
         selectedBlock->Unselect();
@@ -94,9 +94,25 @@ void AFinalProjectBlockGrid::setUnit(int32 u){
 	if (selectedBlock == NULL || selectedBlock->clear == false) {
 		return;
 	}
-	//int u = 88;
+
+	bool legalplacement = false;
+	if(u != (int32)0){
+		UE_LOG(LogTemp, Warning, TEXT("NOT A KING"));
+		for(int i = -2; i<3;i++){
+			for(int j = -2;j<3;j++){
+				if(selectedBlock->row + i >= 0 && selectedBlock->column + j >= 0 && !legalplacement){
+					legalplacement = !(getNode(selectedBlock->row + i, selectedBlock->column + j)->clear);
+				}
+			}
+		}
+		if (!legalplacement){
+			UE_LOG(LogTemp, Warning, TEXT("INVALID PLACEMENT LOCATION, NO UNIT W/IN 2\n"));
+			return;
+		}
+	}
+	
+
 	AUnit *unit;
-    std::string type = "scout";
     int strength;
 	if (u == 3)
 		UE_LOG(LogTemp, Warning, TEXT("ASSASSIN CREATING!!!\n"));
@@ -104,7 +120,6 @@ void AFinalProjectBlockGrid::setUnit(int32 u){
 	switch ((int)u) {
 	case 0:
 		//King
-        type = "king";
         strength = 0;
 		break;
 	case 1:
@@ -123,14 +138,18 @@ void AFinalProjectBlockGrid::setUnit(int32 u){
 		//Scout
         strength = 0;
 		break;
+	case 5:
+		//Guard
+		strength = 5;
+		break;
 	default:
         UE_LOG(LogTemp, Warning, TEXT("in Grid: INVALID UNIT TYPE %d\n"), u);
 		return;
 	}
     FVector location = selectedBlock->BlockLocation;
     location[2] += 100.0f;
-    UE_LOG(LogTemp, Warning, TEXT("DEBUG: block location: %f"), selectedBlock->BlockLocation[2]);
-    UE_LOG(LogTemp, Warning, TEXT("DEBUG: unit location: %f"), location[2]);
+    //UE_LOG(LogTemp, Warning, TEXT("DEBUG: block location: %f"), selectedBlock->BlockLocation[2]);
+    //UE_LOG(LogTemp, Warning, TEXT("DEBUG: unit location: %f"), location[2]);
     unit = GetWorld()->SpawnActor<AUnit>(location, FRotator(0,0,0));
 	selectedBlock->setUnit(unit);
     selectedBlock->unit->initializ(u,strength,selectedBlock, this, selectedBlock->row, selectedBlock->column);
