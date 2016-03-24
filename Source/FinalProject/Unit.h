@@ -53,6 +53,9 @@ public:
     void move();
     //used for soldiers checks for adjacent soldiers
     bool checkSoldiers();
+    //gets node of closest soldier
+    AFinalProjectBlock* getClosestSoldier();
+    bool soldiersNear;
 	// Sets default values for this pawn's properties
 	AUnit();
     

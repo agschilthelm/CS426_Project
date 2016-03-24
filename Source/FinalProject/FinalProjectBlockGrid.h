@@ -2,8 +2,10 @@
 #pragma once
 #include "GameFramework/Actor.h"
 #include "FinalProjectBlock.h"
+#include <list>
 #include "FinalProjectBlockGrid.generated.h"
 
+class AUnit;
 class AFinalProjectBlock;
 /** Class used to spawn blocks and manage score */
 UCLASS(minimalapi)
@@ -40,7 +42,10 @@ public:
     AFinalProjectBlock* selectedBlock;
     
     //list of units
-    //std::list<AUnit*> unitList;
+    std::list<AUnit*> unitList;
+    
+    //gets the distance between two nodes
+    int getDistance(AFinalProjectBlock* node1, AFinalProjectBlock* node2);
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category=Grid)
     FString selectedUnitType;

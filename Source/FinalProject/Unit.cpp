@@ -101,6 +101,7 @@ void AUnit::initializ(int u, int strength, AFinalProjectBlock* node, AFinalProje
     this->currentNode = node;
     this->movedLeft = false;
     this->hasMoved = false;
+    this->soldiersNear = false;
 
 }
 
@@ -127,23 +128,26 @@ void AUnit::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 
 void AUnit::move()
 {
-    if(hasMoved)
+
+    AFinalProjectBlock* destination;
+    destination = currentNode;
+    if(grid->getNorthNode(destination) == NULL) //if the unit has hit the other side of the board do nothing (for now)
     {
-        hasMoved = !hasMoved;
+        //hasMoved = !hasMoved;
         return;
     }
-    AFinalProjectBlock* destination;
-    destination = grid->getNorthNode(currentNode);
-    if(destination == NULL) //if the unit has hit the other side of the board do nothing (for now)
-        return;
     
     if (type == "soldier")
     {
-        if(checkSoldiers())
+        if(this->soldiersNear)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("soldier near"));
             destination = grid->getNorthNode(currentNode);
+        }
         else
         {
             //TO DO - find closest node with a soldier in it and move one space closer
+            destination = getClosestSoldier();
         }
     }
     else if(type == "knight")
@@ -174,45 +178,116 @@ void AUnit::move()
     {
         destination = currentNode;
     }
-    if(destination && destination->clear)
+    if(destination != NULL)
     {
-        destination->unit = this;
-        destination->clear = false;
-        this->currentNode->clear = true;
-        this->currentNode = destination;
-        //FVector ActorLocation = GetActorLocation();
-        FVector BlockLocation = destination->GetActorLocation();
-        // Move it slightly
-        BlockLocation.Z += 100.0f;
-        // Set the location- this will blindly place the actor at the given location
-        SetActorLocation( BlockLocation, false );
+        if(destination->clear && destination != currentNode)
+        {
+            destination->unit = this;
+            destination->clear = false;
+            this->currentNode->clear = true;
+            this->currentNode->unit = NULL;
+            this->currentNode = destination;
+            //FVector ActorLocation = GetActorLocation();
+            FVector BlockLocation = destination->GetActorLocation();
+            // Move it slightly
+            BlockLocation.Z += 100.0f;
+            // Set the location- this will blindly place the actor at the given location
+            SetActorLocation( BlockLocation, false );
+        }
     }
     else
     {
         //TO DO - deal with conflicts if node is occupied by friendly or enemy
         
     }
-    hasMoved = !hasMoved;
+}
+
+AFinalProjectBlock* AUnit::getClosestSoldier()
+{
+    AFinalProjectBlock* temp = NULL;
+    AFinalProjectBlock* result;
+    int distance = 0;
+    
+    for(int i = 0; i < grid->columns; i++)
+    {
+        AFinalProjectBlock* node = grid->grid[this->rowLocation][i];
+        if(node->unit)
+        {
+            UE_LOG(LogTemp, Warning, TEXT("found unit in row"));
+            if(node->unit->type == "soldier" && node->unit != this)
+            {
+                UE_LOG(LogTemp, Warning, TEXT("DEBUG 1!!!!!!!!!"));
+                int tempDis = grid->getDistance(node, this->currentNode);
+                if(distance == 0 || distance > tempDis)
+                {
+                    distance = tempDis;
+                    temp = node; //closest soldier
+                }
+            }
+        }
+    }
+    if(temp != NULL)
+    {
+        if(temp->column < currentNode->column)
+        {
+            result = grid->getWestNode(currentNode);
+            UE_LOG(LogTemp, Warning, TEXT("west node"));
+        }
+        else
+        {
+            result = grid->getEastNode(currentNode);
+            UE_LOG(LogTemp, Warning, TEXT("east node"));
+        }
+    }
+    else
+        result = NULL;
+    
+    return result;
 }
 
 bool AUnit::checkSoldiers()
 {
+    
     AFinalProjectBlock* neighbor;
     neighbor = grid->getNorthNode(currentNode);
-    if(neighbor && neighbor->unit->type == "soldier")
-        return true;
+    if(neighbor)
+    {
+        if(neighbor->unit != NULL)
+        {
+            if (neighbor->unit->type == "soldier")
+                return true;
+        }
+    }
     
     neighbor = grid->getSouthNode(currentNode);
-    if(neighbor && neighbor->unit->type == "soldier")
-        return true;
+    if(neighbor)
+    {
+        if(neighbor->unit != NULL)
+        {
+            if (neighbor->unit->type == "soldier")
+                return true;
+        }
+    }
     
     neighbor = grid->getEastNode(currentNode);
-    if(neighbor && neighbor->unit->type == "soldier")
-        return true;
+    if(neighbor)
+    {
+        if(neighbor->unit != NULL)
+        {
+            if (neighbor->unit->type == "soldier")
+                return true;
+        }
+    }
     
     neighbor = grid->getWestNode(currentNode);
-    if(neighbor && neighbor->unit->type == "soldier")
-        return true;
+    if(neighbor)
+    {
+        if(neighbor->unit != NULL)
+        {
+            if (neighbor->unit->type == "soldier")
+                return true;
+        }
+    }
     
     return false;
 }

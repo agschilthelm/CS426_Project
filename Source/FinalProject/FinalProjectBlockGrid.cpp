@@ -35,15 +35,16 @@ AFinalProjectBlockGrid::AFinalProjectBlockGrid()
 
 void AFinalProjectBlockGrid::moveUnits() {
 	UE_LOG(LogTemp, Warning, TEXT("MOVING UNITS!!!\n"));
-	//iterate through blocks and call their movement
-	for (int i = 0; i < rows; i++)
-	{
-		for (int j = 0; j < columns; j++)
-		{
-			if (grid[i][j]->unit)
-				grid[i][j]->unit->move();
-		}
-	}
+	//iterate through units and call their movement
+    std::list<AUnit*>::iterator iter;
+    for (iter = unitList.begin(); iter != unitList.end(); iter++)
+        if (*iter != NULL)
+            if((*iter)->type == "soldier")
+                (*iter)->soldiersNear = (*iter)->checkSoldiers();
+    
+    for (iter = unitList.begin(); iter != unitList.end(); iter++)
+        if (*iter != NULL)
+            (*iter)->move();
 }
 
 void AFinalProjectBlockGrid::BeginPlay()
@@ -133,6 +134,7 @@ void AFinalProjectBlockGrid::setUnit(int32 u){
     unit = GetWorld()->SpawnActor<AUnit>(location, FRotator(0,0,0));
 	selectedBlock->setUnit(unit);
     selectedBlock->unit->initializ(u,strength,selectedBlock, this, selectedBlock->row, selectedBlock->column);
+    unitList.push_back(unit);
 }
 
 AFinalProjectBlock* AFinalProjectBlockGrid::getNode(int row, int column)
@@ -140,7 +142,30 @@ AFinalProjectBlock* AFinalProjectBlockGrid::getNode(int row, int column)
     return this->grid[row][column];
 }
 
+int AFinalProjectBlockGrid::getDistance(AFinalProjectBlock* node1, AFinalProjectBlock* node2)
+{
+    int row1 = node1->row;
+    int col1 = node1->column;
+    int row2 = node2->row;
+    int col2 = node2->column;
+    return (abs(row2 - row1) + abs(col2 - col1));
+}
+
 AFinalProjectBlock* AFinalProjectBlockGrid::getNorthNode(AFinalProjectBlock* node)
+{
+    int row = node->row;
+    int col = node->column;
+    if (row == this->rows - 1)
+    {
+        return NULL;
+    }
+    else
+    {
+        return getNode(row + 1, col);
+    }
+}
+
+AFinalProjectBlock* AFinalProjectBlockGrid::getSouthNode(AFinalProjectBlock* node)
 {
     if(node == NULL)
         return NULL;
@@ -156,25 +181,11 @@ AFinalProjectBlock* AFinalProjectBlockGrid::getNorthNode(AFinalProjectBlock* nod
     }
 }
 
-AFinalProjectBlock* AFinalProjectBlockGrid::getSouthNode(AFinalProjectBlock* node)
-{
-    int row = node->row;
-    int col = node->column;
-    if (row == this->rows)
-    {
-        return NULL;
-    }
-    else
-    {
-        return getNode(row + 1, col);
-    }
-}
-
 AFinalProjectBlock* AFinalProjectBlockGrid::getEastNode(AFinalProjectBlock* node)
 {
     int row = node->row;
     int col = node->column;
-    if (col == this->columns)
+    if (col == this->columns - 1)
     {
         return NULL;
     }
@@ -188,7 +199,7 @@ AFinalProjectBlock* AFinalProjectBlockGrid::getWestNode(AFinalProjectBlock* node
 {
     int row = node->row;
     int col = node->column;
-    if (col == this->columns)
+    if (col == 0)
     {
         return NULL;
     }
@@ -202,35 +213,7 @@ AFinalProjectBlock* AFinalProjectBlockGrid::getNorthEastNode(AFinalProjectBlock*
 {
     int row = node->row;
     int col = node->column;
-    if (row == this->rows || col == 0)
-    {
-        return NULL;
-    }
-    else
-    {
-        return getNode(row - 1, col + 1);
-    }
-}
-
-AFinalProjectBlock* AFinalProjectBlockGrid::getNorthWestNode(AFinalProjectBlock* node)
-{
-    int row = node->row;
-    int col = node->column;
-    if (row == 0 || col == 0)
-    {
-        return NULL;
-    }
-    else
-    {
-        return getNode(row - 1, col - 1);
-    }
-}
-
-AFinalProjectBlock* AFinalProjectBlockGrid::getSouthEastNode(AFinalProjectBlock* node)
-{
-    int row = node->row;
-    int col = node->column;
-    if (row == this->rows || col == this->columns)
+    if (row == this->rows -1 || col == this->columns -1)
     {
         return NULL;
     }
@@ -240,8 +223,37 @@ AFinalProjectBlock* AFinalProjectBlockGrid::getSouthEastNode(AFinalProjectBlock*
     }
 }
 
+AFinalProjectBlock* AFinalProjectBlockGrid::getNorthWestNode(AFinalProjectBlock* node)
+{
+    int row = node->row;
+    int col = node->column;
+    if (row == this->rows -1 || col == 0)
+    {
+        return NULL;
+    }
+    else
+    {
+        return getNode(row + 1, col - 1);
+    }
+}
+
+AFinalProjectBlock* AFinalProjectBlockGrid::getSouthEastNode(AFinalProjectBlock* node)
+{
+    int row = node->row;
+    int col = node->column;
+    if (row == 0 || this->columns -1)
+    {
+        return NULL;
+    }
+    else
+    {
+        return getNode(row - 1, col + 1);
+    }
+}
+
 AFinalProjectBlock* AFinalProjectBlockGrid::getSouthWestNode(AFinalProjectBlock* node)
 {
+    
     int row = node->row;
     int col = node->column;
     if (row == 0 || col == 0)
@@ -250,7 +262,7 @@ AFinalProjectBlock* AFinalProjectBlockGrid::getSouthWestNode(AFinalProjectBlock*
     }
     else
     {
-        return getNode(row + 1, col - 1);
+        return getNode(row - 1, col - 1);
     }
 }
 
