@@ -2,6 +2,7 @@
 
 #include "FinalProject.h"
 #include "Unit.h"
+#include "PlayerInfo.h"
 
 
 // Sets default values
@@ -53,7 +54,8 @@ AUnit::AUnit()
 
 }
 
-void AUnit::initializ(int u, int strength, AFinalProjectBlock* node, AFinalProjectBlockGrid* grid, int row, int column)
+void AUnit::initializ(int u, int strength, AFinalProjectBlock* node,
+	AFinalProjectBlockGrid* grid, int row, int column, APlayerInfo* player)
 {
 	switch (u) {
 	case 0:
@@ -106,6 +108,27 @@ void AUnit::initializ(int u, int strength, AFinalProjectBlock* node, AFinalProje
     this->movedLeft = false;
     this->hasMoved = false;
     this->soldiersNear = false;
+	this->alive = true;
+
+	this->owningPlayer = player;
+
+	if (this->owningPlayer == currentNode->OwningGrid->player2)
+		movedLeft = true;
+
+	if (type == "assassin")
+	{
+		//find which side of the board is closest
+		if (columnLocation < this->grid->columns / 2)
+		{
+			//left side of the board
+			assassinLeft = false;
+		}
+		else
+		{
+			assassinLeft = true;
+		}
+	}
+	
 
 }
 
@@ -128,6 +151,94 @@ void AUnit::SetupPlayerInputComponent(class UInputComponent* InputComponent)
 {
 	Super::SetupPlayerInputComponent(InputComponent);
 
+}
+
+void AUnit::player2Move()
+{
+	AFinalProjectBlock* destination;
+	destination = currentNode;
+	if (grid->getSouthNode(destination) == NULL) //if the unit has hit the other side of the board do nothing (for now)
+	{
+		return;
+	}
+	if (type == "soldier")
+	{
+		if (this->soldiersNear)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("soldier near"));
+			destination = grid->getSouthNode(currentNode);
+		}
+		else
+		{
+			//TO DO - find closest node with a soldier in it and move one space closer
+			destination = getClosestSoldier();
+		}
+	}
+	else if (type == "knight")
+	{
+		if (movedLeft)
+		{
+			destination = grid->getSouthWestNode(currentNode);
+		}
+		else
+		{
+			destination = grid->getSouthEastNode(currentNode);
+		}
+		movedLeft = !movedLeft;
+		if (destination == NULL)
+			this->player2Move(); //if the knight hits the side of the board then go the other way
+	}
+	else if (type == "scout")
+	{
+		destination = grid->getSouthNode(grid->getSouthNode(currentNode)); //scout moves 2 spaces forward
+		if (destination == NULL)
+			return;
+	}
+	else if (type == "assassin")
+	{
+		//moves diagonally
+		//find which side is closest
+		if (assassinLeft)
+		{
+			//left side of the board
+			destination = grid->getSouthEastNode(currentNode);
+		}
+		else
+		{
+			destination = grid->getSouthWestNode(currentNode);
+		}
+		if (destination == NULL)
+		{
+			assassinLeft = !assassinLeft;
+			this->player2Move();
+		}
+
+	}
+	else //its a guard or king
+	{
+		destination = currentNode;
+	}
+	if (destination != NULL)
+	{
+		if (destination->clear && destination != currentNode)
+		{
+			destination->unit = this;
+			destination->clear = false;
+			this->currentNode->clear = true;
+			this->currentNode->unit = NULL;
+			this->currentNode = destination;
+			FVector BlockLocation = destination->GetActorLocation();
+			// Move it slightly
+			BlockLocation.Z += 100.0f;
+			// Set the location- this will blindly place the actor at the given location
+			SetActorLocation(BlockLocation, false);
+		}
+		else
+		{
+			//conflicts
+			this->unitConflict(destination);
+		}
+	}
 }
 
 void AUnit::move()
@@ -176,7 +287,22 @@ void AUnit::move()
     }
     else if(type == "assassin")
     {
-        //finds shortest path to enemy king when spawned and moves one space along it
+        //moves diagonally
+		//find which side of the board is closest
+		if (assassinLeft)
+		{
+			//left side of the board
+			destination = grid->getNorthWestNode(currentNode);
+		}
+		else
+		{
+			destination = grid->getNorthEastNode(currentNode);
+		}
+		if (destination == NULL)
+		{
+			assassinLeft = !assassinLeft;
+			this->move();
+		}
     }
     else //its a guard or king
     {
@@ -198,12 +324,69 @@ void AUnit::move()
             // Set the location- this will blindly place the actor at the given location
             SetActorLocation( BlockLocation, false );
         }
+		else
+		{
+			this->unitConflict(destination);
+		}
     }
-    else
-    {
-        //TO DO - deal with conflicts if node is occupied by friendly or enemy
-        
-    }
+}
+
+void AUnit::unitConflict(AFinalProjectBlock* destination)
+{
+	AUnit* enemy = destination->unit;
+	if (this->owningPlayer == destination->unit->owningPlayer) //freindly unit
+	{
+		return;
+	}
+	else
+	{
+		//enemy unit
+		if (this->strength > enemy->strength)
+		{
+			this->currentNode->clear = true;
+			this->currentNode->unit = NULL;
+			this->currentNode = destination;
+			//remove enemy unit from the players list
+			//enemy->owningPlayer->unitList.remove(enemy);
+			enemy->alive = false;
+			//delete it from the game world
+			//enemy->Destroy();
+			currentNode->OwningGrid->killList.push_back(enemy);
+			destination->unit = this;
+			FVector BlockLocation = destination->GetActorLocation();
+			// Move it slightly
+			BlockLocation.Z += 100.0f;
+			// Set the location- this will blindly place the actor at the given location
+			SetActorLocation(BlockLocation, false);
+		}
+		else if(this->strength < enemy->strength)
+		{
+			this->currentNode->clear = true;
+			this->currentNode->unit = NULL;
+			//this->owningPlayer->unitList.remove(this);
+			this->alive = false;
+			//this->Destroy();
+			currentNode->OwningGrid->killList.push_back(this);
+		}
+		else
+		{
+			//kill both the units
+			destination->clear = true;
+			destination->unit = NULL;
+			//enemy->owningPlayer->unitList.remove(enemy);
+			enemy->alive = false;
+			//enemy->Destroy();
+			currentNode->OwningGrid->killList.push_back(enemy);
+
+			this->currentNode->clear = true;
+			this->currentNode->unit = NULL;
+			//this->owningPlayer->unitList.remove(this);
+			this->alive = false;
+			//this->Destroy();
+			currentNode->OwningGrid->killList.push_back(this);
+		}
+	}
+
 }
 
 AFinalProjectBlock* AUnit::getClosestSoldier()
@@ -218,7 +401,7 @@ AFinalProjectBlock* AUnit::getClosestSoldier()
         if(node->unit)
         {
             UE_LOG(LogTemp, Warning, TEXT("found unit in row"));
-            if(node->unit->type == "soldier" && node->unit != this)
+            if(node->unit->type == "soldier" && node->unit != this && node->unit->owningPlayer == this->owningPlayer)
             {
                 UE_LOG(LogTemp, Warning, TEXT("DEBUG 1!!!!!!!!!"));
                 int tempDis = grid->getDistance(node, this->currentNode);
@@ -258,7 +441,7 @@ bool AUnit::checkSoldiers()
     {
         if(neighbor->unit != NULL)
         {
-            if (neighbor->unit->type == "soldier")
+            if (neighbor->unit->type == "soldier" && neighbor->unit->owningPlayer == this->owningPlayer)
                 return true;
         }
     }
@@ -268,7 +451,7 @@ bool AUnit::checkSoldiers()
     {
         if(neighbor->unit != NULL)
         {
-            if (neighbor->unit->type == "soldier")
+            if (neighbor->unit->type == "soldier" && neighbor->unit->owningPlayer == this->owningPlayer)
                 return true;
         }
     }
@@ -278,7 +461,7 @@ bool AUnit::checkSoldiers()
     {
         if(neighbor->unit != NULL)
         {
-            if (neighbor->unit->type == "soldier")
+            if (neighbor->unit->type == "soldier" && neighbor->unit->owningPlayer == this->owningPlayer)
                 return true;
         }
     }
@@ -288,7 +471,7 @@ bool AUnit::checkSoldiers()
     {
         if(neighbor->unit != NULL)
         {
-            if (neighbor->unit->type == "soldier")
+            if (neighbor->unit->type == "soldier" && neighbor->unit->owningPlayer == this->owningPlayer)
                 return true;
         }
     }

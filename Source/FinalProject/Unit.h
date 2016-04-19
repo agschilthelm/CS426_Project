@@ -10,6 +10,7 @@
 
 class AFinalProjectBlockGrid;
 class AFinalProjectBlock;
+class APlayerInfo;
 UCLASS()
 class FINALPROJECT_API AUnit : public APawn
 {
@@ -28,7 +29,12 @@ public:
     bool movedLeft; //used for tracking the knights previous movestep
     bool hasMoved; //tracks if the unit has moved this turn
     std::string type;
+	bool assassinLeft;
+
+	APlayerInfo* owningPlayer;
     
+	bool alive;
+
     int rowLocation;
     int columnLocation;
     FVector location;
@@ -51,6 +57,8 @@ public:
     
     //executes the units movement based on the rules
     void move();
+	void unitConflict(AFinalProjectBlock* destination);
+	void player2Move();
     //used for soldiers checks for adjacent soldiers
     bool checkSoldiers();
     //gets node of closest soldier
@@ -60,7 +68,8 @@ public:
 	AUnit();
     
     //UFUNCTION()
-    void initializ(int u, int strength, AFinalProjectBlock* node, AFinalProjectBlockGrid* grid, int row, int column);
+    void initializ(int u, int strength, AFinalProjectBlock* node,
+		AFinalProjectBlockGrid* grid, int row, int column, APlayerInfo* player);
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

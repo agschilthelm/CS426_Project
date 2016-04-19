@@ -7,6 +7,7 @@
 
 class AUnit;
 class AFinalProjectBlock;
+class APlayerInfo;
 /** Class used to spawn blocks and manage score */
 UCLASS(minimalapi)
 class AFinalProjectBlockGrid : public AActor
@@ -30,6 +31,10 @@ public:
     //grid to hold the blocks
     //AFinalProjectBlock grid[][];
     
+	APlayerInfo* player1;
+	APlayerInfo* player2;
+	APlayerInfo* activePlayer;
+
     AFinalProjectBlock*** grid;
     
 	AFinalProjectBlockGrid();
@@ -43,7 +48,12 @@ public:
     
     //list of units
     std::list<AUnit*> unitList;
+	std::list<AUnit*> killList;
     
+	bool legalPlace();
+
+	
+
     //gets the distance between two nodes
     int getDistance(AFinalProjectBlock* node1, AFinalProjectBlock* node2);
     
@@ -53,6 +63,9 @@ public:
 	/** Number of blocks along each side of grid */
 	UPROPERTY(Category=Grid, EditAnywhere, BlueprintReadOnly)
 	int32 Size;
+
+	UPROPERTY(Category = Grid, EditAnywhere, BlueprintReadOnly)
+		int32 playerInt;
 
 	/** Spacing of blocks */
 	UPROPERTY(Category=Grid, EditAnywhere, BlueprintReadOnly)
@@ -72,6 +85,12 @@ public:
     UFUNCTION(BlueprintCallable, Category = "Units")
     void moveUnits();
     
+	UFUNCTION(BlueprintCallable, Category = "Pl4yer")
+	void endTurn();
+
+	UFUNCTION(BlueprintCallable, Category = "Pl4yer")
+	void enableAI();
+
     //getters for the grid node and its neighbors
     AFinalProjectBlock* getNode(int row, int column);
     AFinalProjectBlock* getNorthNode(AFinalProjectBlock* node);
