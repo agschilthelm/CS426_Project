@@ -88,9 +88,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Pl4yer")
 	void endTurn();
 
-	UFUNCTION(BlueprintCallable, Category = "Pl4yer")
-	void enableAI();
-
     //getters for the grid node and its neighbors
     AFinalProjectBlock* getNode(int row, int column);
     AFinalProjectBlock* getNorthNode(AFinalProjectBlock* node);

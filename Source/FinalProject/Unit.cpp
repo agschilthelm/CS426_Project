@@ -20,7 +20,7 @@ AUnit::AUnit()
         ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> RedMaterial;
         ConstructorHelpers::FObjectFinderOptional<UMaterialInstance> GreenMaterial;
         FConstructorStatics()
-        : PlaneMesh(TEXT("/Game/Puzzle/Meshes/Cone.Cone")) //change these meshes and materials for each unit type
+        : PlaneMesh(TEXT("/Game/Puzzle/Meshes/soldier")) //change these meshes and materials for each unit type
         , BlueMaterial(TEXT("/Game/Puzzle/Meshes/BlueMaterial.BlueMaterial"))
         , OrangeMaterial(TEXT("/Game/Puzzle/Meshes/OrangeMaterial.OrangeMaterial"))
         , WhiteMaterial(TEXT("/Game/Puzzle/Meshes/WhiteMaterial.WhiteMaterial"))
@@ -47,8 +47,9 @@ AUnit::AUnit()
     // Create static mesh component
     mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("UnitMesh0"));
     mesh->SetStaticMesh(ConstructorStatics.PlaneMesh.Get());
-    mesh->SetRelativeScale3D(FVector(1.5f,1.5f,1.5f));
+    mesh->SetRelativeScale3D(FVector(3.0f,3.0f,3.0f));
     mesh->SetRelativeLocation(FVector(0.f,0.f,30.f));
+    //mesh->setRelativeRotation(90);
     mesh->SetMaterial(0, WhiteMaterial);
     mesh->AttachTo(DummyRoot);
 
@@ -67,7 +68,7 @@ void AUnit::initializ(int u, int strength, AFinalProjectBlock* node,
 	case 1:
 		//Knight
 		type = "knight";
-		cost = 5;
+		cost = 3;
 		mesh->SetMaterial(0, OrangeMaterial);
 		break;
 	case 2:
@@ -109,11 +110,14 @@ void AUnit::initializ(int u, int strength, AFinalProjectBlock* node,
     this->hasMoved = false;
     this->soldiersNear = false;
 	this->alive = true;
+	this->reverseAssassin = false;
 
 	this->owningPlayer = player;
+	if (type == "king")
+		owningPlayer->king = this;
 
-	if (this->owningPlayer == currentNode->OwningGrid->player2)
-		movedLeft = true;
+	//if (this->owningPlayer == currentNode->OwningGrid->player2)
+	//	this->movedLeft = true;
 
 	if (type == "assassin")
 	{
@@ -142,7 +146,7 @@ void AUnit::BeginPlay()
 // Called every frame
 void AUnit::Tick( float DeltaTime )
 {
-	Super::Tick( DeltaTime );
+	//Super::Tick( DeltaTime );
 
 }
 
@@ -159,7 +163,19 @@ void AUnit::player2Move()
 	destination = currentNode;
 	if (grid->getSouthNode(destination) == NULL) //if the unit has hit the other side of the board do nothing (for now)
 	{
-		return;
+		if (type != "assassin")
+		{
+			//hasMoved = !hasMoved;
+			currentNode->OwningGrid->killList.push_back(this);
+			owningPlayer->money += (this->cost / 2);
+			currentNode->unit = NULL;
+			currentNode->clear = true;
+			return;
+		}
+		else
+		{
+			reverseAssassin = !reverseAssassin;
+		}
 	}
 	if (type == "soldier")
 	{
@@ -248,8 +264,19 @@ void AUnit::move()
     destination = currentNode;
     if(grid->getNorthNode(destination) == NULL) //if the unit has hit the other side of the board do nothing (for now)
     {
-        //hasMoved = !hasMoved;
-        return;
+		if (type != "assassin")
+		{
+			//hasMoved = !hasMoved;
+			currentNode->OwningGrid->killList.push_back(this);
+			owningPlayer->money += (this->cost / 2);
+			currentNode->unit = NULL;
+			currentNode->clear = true;
+			return;
+		}
+		else
+		{
+			reverseAssassin = !reverseAssassin;
+		}
     }
     
     if (type == "soldier")
@@ -385,6 +412,11 @@ void AUnit::unitConflict(AFinalProjectBlock* destination)
 			//this->Destroy();
 			currentNode->OwningGrid->killList.push_back(this);
 		}
+
+		if (enemy->type == "knight")
+		{
+			enemy->strength = enemy->strength - this->strength;
+		}
 	}
 
 }
@@ -434,15 +466,19 @@ AFinalProjectBlock* AUnit::getClosestSoldier()
 
 bool AUnit::checkSoldiers()
 {
-    
+	this->strength = 0;
+	bool result = false;
     AFinalProjectBlock* neighbor;
     neighbor = grid->getNorthNode(currentNode);
     if(neighbor)
     {
         if(neighbor->unit != NULL)
         {
-            if (neighbor->unit->type == "soldier" && neighbor->unit->owningPlayer == this->owningPlayer)
-                return true;
+			if (neighbor->unit->type == "soldier" && neighbor->unit->owningPlayer == this->owningPlayer)
+			{
+				this->strength += 1;
+				result = true;
+			}
         }
     }
     
@@ -452,7 +488,10 @@ bool AUnit::checkSoldiers()
         if(neighbor->unit != NULL)
         {
             if (neighbor->unit->type == "soldier" && neighbor->unit->owningPlayer == this->owningPlayer)
-                return true;
+			{
+				this->strength += 1;
+				result = true;
+			}
         }
     }
     
@@ -462,7 +501,10 @@ bool AUnit::checkSoldiers()
         if(neighbor->unit != NULL)
         {
             if (neighbor->unit->type == "soldier" && neighbor->unit->owningPlayer == this->owningPlayer)
-                return true;
+			{
+				this->strength += 1;
+				result = true;
+			}
         }
     }
     
@@ -472,10 +514,14 @@ bool AUnit::checkSoldiers()
         if(neighbor->unit != NULL)
         {
             if (neighbor->unit->type == "soldier" && neighbor->unit->owningPlayer == this->owningPlayer)
-                return true;
+			{
+				this->strength += 1;
+				result = true;
+			}
         }
     }
     
-    return false;
+    return result;
 }
+
 

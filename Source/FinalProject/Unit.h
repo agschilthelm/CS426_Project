@@ -30,7 +30,7 @@ public:
     bool hasMoved; //tracks if the unit has moved this turn
     std::string type;
 	bool assassinLeft;
-
+	bool reverseAssassin;
 	APlayerInfo* owningPlayer;
     
 	bool alive;

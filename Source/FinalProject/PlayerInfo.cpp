@@ -45,6 +45,7 @@ APlayerInfo::APlayerInfo()
 	this->money = 10;
 	this->turnCount = 0;
 	kingAlive = false;
+	king = NULL;
 	UE_LOG(LogTemp, Warning, TEXT("CREATING PLAYER"));
 }
 

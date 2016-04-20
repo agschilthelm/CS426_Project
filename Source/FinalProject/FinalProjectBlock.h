@@ -48,7 +48,9 @@ public:
 	/** Pointer to Blue material used on active blocks */
 	UPROPERTY()
 	class UMaterialInstance* BlueMaterial;
-
+	
+	UPROPERTY()
+	class UMaterial* defaultMaterial;
 
 	/** Grid that owns us */
 	UPROPERTY()

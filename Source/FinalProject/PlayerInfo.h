@@ -29,6 +29,7 @@ public:
 	void addUnit(AUnit* unit);
 	int turnCount;
 	bool kingAlive;
+	AUnit* king;
 
 	/** Pointer to orange material used on active blocks */
 	UPROPERTY()

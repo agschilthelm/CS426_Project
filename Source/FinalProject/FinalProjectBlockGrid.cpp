@@ -178,11 +178,11 @@ void AFinalProjectBlockGrid::setUnit(int32 u){
 	case 2:
 		//Soldier
 		cost = 2;
-        strength = 1;
+        strength = 0;
 		break;
 	case 3:
 		//Assassin
-		cost = 3;
+		cost = 4;
         strength = 3;
 		break;
 	case 4:
@@ -199,12 +199,15 @@ void AFinalProjectBlockGrid::setUnit(int32 u){
         UE_LOG(LogTemp, Warning, TEXT("in Grid: INVALID UNIT TYPE %d\n"), u);
 		return;
 	}
-	activePlayer->money = activePlayer->money - cost;
-	if (activePlayer->money < 0)
+
+	if (activePlayer->money <= 0 || activePlayer->money < cost)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("player out of money"));
+		UE_LOG(LogTemp, Warning, TEXT("NOT ENOUGH MONEY"));
 		return;
 	}
+	else
+		activePlayer->money = activePlayer->money - cost;
+
     FVector location = selectedBlock->BlockLocation;
     location[2] += 100.0f;
     unit = GetWorld()->SpawnActor<AUnit>(location, FRotator(0,0,0));
@@ -217,7 +220,7 @@ void AFinalProjectBlockGrid::setUnit(int32 u){
 void AFinalProjectBlockGrid::endTurn()
 {
 	activePlayer->turnCount++;
-	activePlayer->money = 10;
+	activePlayer->money = activePlayer->money + 10;
 	if (activePlayer == player1)
 	{
 		playerInt = 1;
@@ -270,14 +273,20 @@ void AFinalProjectBlockGrid::endTurn()
 
 		activePlayer = player1;
 		playerInt = 0;
+
+		//check for endgame
+		if (!this->player1->king->alive)
+		{
+
+		}
+		else if (!this->player2->king->alive)
+		{
+
+		}
 	}
 		
 
 
-
-}
-
-void AFinalProjectBlockGrid::enableAI() {
 
 }
 
